@@ -7,7 +7,9 @@
  <ListView 
 	android:id="@+id/android:list"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"/>
+    android:layout_height="wrap_content"
+    android:divider = "#444444"
+    android:dividerHeight = "1sp"/>
  <TextView 
  	android:id="@+id/android:empty"
  	android:layout_width = "wrap_content"

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World!</string>
-    <string name="app_name">Android GTFS Reader</string>
+    <string name="app_name">GTFS Reader</string>
+<!--<string name="menu_insert">Add Quote</string>-->
+    <string name="menu_delete">Delete Agency</string>
+    <string name="confirm">Confirm</string>
 </resources>
