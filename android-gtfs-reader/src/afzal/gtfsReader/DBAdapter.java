@@ -147,9 +147,8 @@ public class DBAdapter {
 		return mCursor;
 	}
 	
-	// updates an agency[
-	
-	public boolean updateAgency(long rowId, String agency_id, String agency_name, String agency_url, String agency_timezone, String agency_lang, String agency_phone) {
+	// updates an agency
+		public boolean updateAgency(long rowId, String agency_id, String agency_name, String agency_url, String agency_timezone, String agency_lang, String agency_phone) {
 		ContentValues args = new ContentValues();
 		args.put(KEY_AGENCYID, agency_id);
 		args.put(KEY_AGENCYNAME, agency_name);

@@ -1,6 +1,7 @@
 package afzal.gtfsReader;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -9,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 public class AgencyList extends ListActivity {     
@@ -26,21 +28,34 @@ public class AgencyList extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        // open db
-        db.open();        
         // get and display all agencies
         DisplayAgencies();
         registerForContextMenu(getListView());
-        db.close();
+        
+    }
+    
+//    @Override
+//    protected void onPause() {
+//        stopManagingCursor(agencyCursor);
+//        agencyCursor.close();
+//        super.onPause();
+//    }
+ 
+    @Override
+    protected void onResume() {
+        DisplayAgencies();
+        super.onResume();
     }
     
     public void DisplayAgencies()
     {
+        // open db
+        db.open();
     	// Get all of the rows from the database
     	// and create the item list
     	agencyCursor = db.getAllAgencies();
     	startManagingCursor(agencyCursor);
-    	
+
     	// array to specify the fields to display in the list
     	String[] from = new String[]{DBAdapter.KEY_AGENCYNAME, DBAdapter.KEY_AGENCYPHONE};
     	
@@ -50,6 +65,8 @@ public class AgencyList extends ListActivity {
     	// Simple cursor adapter; set to display
     	SimpleCursorAdapter agencies = new SimpleCursorAdapter(this, R.layout.agency_list_item, agencyCursor, from, to);
     	setListAdapter(agencies);
+    	// close db
+    	db.close();
     }
     
     @Override
@@ -103,5 +120,15 @@ public class AgencyList extends ListActivity {
     		}
     	return super.onContextItemSelected(item);
     }
+    
+    public void onListItemClick(ListView l, View v, int position, long id) {
+    //	super.onListItemClick(l, v, position, id);
+    	Cursor c = agencyCursor;
+    	c.moveToPosition(position);
+    	Intent i = new Intent(this, AgencyDetails.class);
+        i.putExtra("_id", id);
+        startActivity(i);
+    }
+
 
 }
