@@ -107,6 +107,8 @@ public class AgencyList extends ListActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
+    	String agencyname = agencyCursor.getString(agencyCursor.getColumnIndex("agency_name")); 
+    	menu.setHeaderTitle(agencyname);
     	menu.add(0, DELETE_ID, 0, R.string.menu_delete);
     	menu.add(0, DETAIL, 0, R.string.menu_detail);
     }

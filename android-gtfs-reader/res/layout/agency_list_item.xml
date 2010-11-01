@@ -12,7 +12,7 @@
             android:textSize="22sp"
             android:textColor="#ffffff"
             android:paddingTop="10sp"
-            android:paddingBottom="10sp"
+            android:paddingBottom="11sp"
             />
             
 </RelativeLayout>
