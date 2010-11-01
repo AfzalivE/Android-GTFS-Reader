@@ -4,4 +4,7 @@
 <!--<string name="menu_insert">Add Quote</string>-->
     <string name="menu_delete">Delete Agency</string>
     <string name="confirm">Confirm</string>
+    <string name="menu_detail">Detail</string>
+    <string name="phone">Call</string>
+    <string name="url">Website</string>
 </resources>

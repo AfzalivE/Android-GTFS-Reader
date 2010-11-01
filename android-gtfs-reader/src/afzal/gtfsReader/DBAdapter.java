@@ -107,6 +107,11 @@ public class DBAdapter {
 		return db.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
 	}
 	
+	// deletes all agencies
+	public boolean deleteAllAgencies() {
+		return db.delete(DATABASE_TABLE, KEY_ROWID, null) > 0;
+	}
+	
 	// retrieves all agencies
 	public Cursor getAllAgencies() {
 		return db.query(DATABASE_TABLE, new String[] {

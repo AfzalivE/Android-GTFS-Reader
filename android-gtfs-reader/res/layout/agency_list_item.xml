@@ -9,15 +9,10 @@
             android:id="@+id/agency_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:textSize="22sp"
             android:textColor="#ffffff"
+            android:paddingTop="10sp"
+            android:paddingBottom="10sp"
             />
             
-        <TextView
-			android:id="@+id/agency_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/agency_name"/>
-
 </RelativeLayout>

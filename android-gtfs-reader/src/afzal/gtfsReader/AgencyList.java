@@ -19,7 +19,8 @@ public class AgencyList extends ListActivity {
     
 //  private static final int INSERT_ID = Menu.FIRST;
     private static final int DELETE_ID = Menu.FIRST;
-    private static final int RESET_DB = Menu.FIRST + 1;
+    private static final int DETAIL = Menu.FIRST + 1;
+    private static final int RESET_DB = Menu.FIRST + 2;
     
 	private DBAdapter db = new DBAdapter(this);
 	private Cursor agencyCursor;
@@ -57,10 +58,10 @@ public class AgencyList extends ListActivity {
     	startManagingCursor(agencyCursor);
 
     	// array to specify the fields to display in the list
-    	String[] from = new String[]{DBAdapter.KEY_AGENCYNAME, DBAdapter.KEY_AGENCYPHONE};
+    	String[] from = new String[]{DBAdapter.KEY_AGENCYNAME};
     	
     	// array of fields to bind those fields to
-    	int[] to = new int[]{R.id.agency_name, R.id.agency_phone};
+    	int[] to = new int[]{R.id.agency_name};
     	
     	// Simple cursor adapter; set to display
     	SimpleCursorAdapter agencies = new SimpleCursorAdapter(this, R.layout.agency_list_item, agencyCursor, from, to);
@@ -81,6 +82,7 @@ public class AgencyList extends ListActivity {
         switch(item.getItemId()) {
         case RESET_DB:
     		db.open();
+    		db.deleteAllAgencies();
     		db.insertAgency(
     				"HSR", 
     				"Hamilton Street Railway", 
@@ -97,6 +99,7 @@ public class AgencyList extends ListActivity {
     				"1.888.438.6646");
     		DisplayAgencies();
     		db.close();
+    		
         }
         return super.onMenuItemSelected(featureId, item);
     }
@@ -105,6 +108,7 @@ public class AgencyList extends ListActivity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
     	menu.add(0, DELETE_ID, 0, R.string.menu_delete);
+    	menu.add(0, DETAIL, 0, R.string.menu_detail);
     }
     
     @Override
@@ -117,7 +121,16 @@ public class AgencyList extends ListActivity {
     		DisplayAgencies();
     		db.close();
     		return true;
-    		}
+    		
+    	case DETAIL:
+    		Cursor c = agencyCursor;
+    		AdapterContextMenuInfo info_id = (AdapterContextMenuInfo) item.getMenuInfo();
+			c.moveToPosition(info_id.position);
+        	Intent i = new Intent(this, AgencyDetails.class);
+			i.putExtra("_id", info_id.id);
+            startActivity(i);       
+            return true;
+    	}
     	return super.onContextItemSelected(item);
     }
     
