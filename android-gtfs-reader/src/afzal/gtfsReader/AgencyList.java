@@ -58,12 +58,12 @@ public class AgencyList extends ListActivity {
         
     }
     
-//    @Override
-//    protected void onPause() {
-//        stopManagingCursor(agencyCursor);
-//        agencyCursor.close();
-//        super.onPause();
-//    }
+    @Override
+    protected void onPause() {
+        stopManagingCursor(agencyCursor);
+ //     agencyCursor.close();
+        super.onPause();
+    }
  
     @Override
     protected void onResume() {
@@ -71,8 +71,7 @@ public class AgencyList extends ListActivity {
         super.onResume();
     }
     
-    public void DisplayAgencies()
-    {
+    public void DisplayAgencies() {
         // open db
         db.open();
     	// Get all of the rows from the database
@@ -149,22 +148,24 @@ public class AgencyList extends ListActivity {
     		
     	case DETAIL:
     		Cursor c = agencyCursor;
+            startManagingCursor(c);
     		AdapterContextMenuInfo info_id = (AdapterContextMenuInfo) item.getMenuInfo();
 			c.moveToPosition(info_id.position);
         	Intent i = new Intent(this, AgencyDetails.class);
 			i.putExtra("_id", info_id.id);
-            startActivity(i);       
+            startActivity(i);    
             return true;
     	}
     	return super.onContextItemSelected(item);
     }
     
     public void onListItemClick(ListView l, View v, int position, long id) {
-    //	super.onListItemClick(l, v, position, id);
+    	super.onListItemClick(l, v, position, id);
     	Cursor c = agencyCursor;
+        startManagingCursor(c);
     	c.moveToPosition(position);
-    	Intent i = new Intent(this, AgencyDetails.class);
-        i.putExtra("_id", id);
+    	Intent i = new Intent(this, StopList.class);
+    	i.putExtra("sagency_id", id);
         startActivity(i);
     }
 

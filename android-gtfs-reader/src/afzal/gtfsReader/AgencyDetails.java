@@ -38,7 +38,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.app.ListActivity;
 
-
 public class AgencyDetails extends ListActivity {
 	
 	private List<AgencyAction> actions;
@@ -46,7 +45,7 @@ public class AgencyDetails extends ListActivity {
 	private Long rowId;
 	private Cursor agencyCursor;
 	
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
@@ -74,6 +73,13 @@ public class AgencyDetails extends ListActivity {
     	setListAdapter(details);
 
 	}
+	
+    @Override
+    protected void onStop() {
+        stopManagingCursor(agencyCursor);
+        agencyCursor.close();
+        super.onPause();
+    }
 	
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		AgencyAction action = actions.get(position);

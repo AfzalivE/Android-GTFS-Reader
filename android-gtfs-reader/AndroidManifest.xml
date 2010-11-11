@@ -12,6 +12,7 @@
             </intent-filter>
         </activity>
         <activity android:name="AgencyDetails"></activity>
+         <activity android:name="StopList"></activity>
     </application>
 
 
