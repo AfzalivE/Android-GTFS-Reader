@@ -26,6 +26,7 @@ package afzal.gtfsReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import afzal.gtfsReader.DBAdapter.DBHelper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -41,7 +42,7 @@ import android.app.ListActivity;
 public class AgencyDetails extends ListActivity {
 	
 	private List<AgencyAction> actions;
-	private DBAdapter db = new DBAdapter(this);
+	private DBHelper db = new DBHelper();
 	private Long rowId;
 	private Cursor agencyCursor;
 	
@@ -80,7 +81,12 @@ public class AgencyDetails extends ListActivity {
         agencyCursor.close();
         super.onPause();
     }
-	
+    
+//    @Override
+//    protected void onDestroy () {
+//    	db.close();
+//    }
+//	
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		AgencyAction action = actions.get(position);
 		

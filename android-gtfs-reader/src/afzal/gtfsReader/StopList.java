@@ -23,13 +23,14 @@
 
 package afzal.gtfsReader;
 
+import afzal.gtfsReader.DBAdapter.DBHelper;
 import android.app.ListActivity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.SimpleCursorAdapter;
 
 public class StopList extends ListActivity {
-	private DBAdapter db = new DBAdapter(this);
+	private DBHelper db = new DBHelper();
 	private Long rowId;
 	private Cursor stopCursor;
 	
@@ -52,12 +53,17 @@ public class StopList extends ListActivity {
         super.onPause();
     }
     
+//    @Override
+//    protected void onDestroy () {
+//    	db.close();
+//    }
+    
     public void DisplayStops(long rowId) {
         // open db
         db.open();
     	// Get all of the rows from the database
     	// and create the item list
-    	stopCursor = db.getStops(rowId);
+    	stopCursor = db.getAllStops(rowId);
     	startManagingCursor(stopCursor);
 
     	// array to specify the fields to display in the list

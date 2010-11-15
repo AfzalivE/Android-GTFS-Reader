@@ -11,8 +11,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="AgencyEdit"></activity>
         <activity android:name="AgencyDetails"></activity>
-         <activity android:name="StopList"></activity>
+        <activity android:name="StopList"></activity>
     </application>
 
 

@@ -23,15 +23,22 @@
 
 package afzal.gtfsReader;
 
+import java.io.File;
+
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 public class DBAdapter {
+	// DB File strings	
+	private static final String DATABASE_NAME = "gtfs";
+	private static final String AGENCIES_TABLE = "agencies";
+	private static final String STOPS_TABLE = "stops";
+	private static final int DATABASE_VERSION = 1;
+	
 	// Agency List strings
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_AGENCYID = "agency_id";
@@ -53,22 +60,7 @@ public class DBAdapter {
 	public static final String KEY_STOPURL = "stop_url";
 	public static final String KEY_LOCATIONTYPE = "location_type";
 	public static final String KEY_PARENTSTATION = "parent_station";
-	
-	
-	
-	
-	private static final String TAG = "DBAdapter";
-	
-	private static final String DATABASE_NAME = "gtfs";
-	private static final String AGENCIES_TABLE = "agencies";
-	private static final String STOPS_TABLE = "stops";
-	private static final int DATABASE_VERSION = 1;
-	
-	private final Context context;
-	
-	private DatabaseHelper DBHelper;
-	private SQLiteDatabase db;
-	
+
 	private static final String AGENCYDB_CREATE =
 		"create table agencies (_id INTEGER primary key autoincrement, "
 		+ "agency_id TEXT, "
@@ -91,18 +83,38 @@ public class DBAdapter {
 		+ "location_type BOOL, "
 		+ "parent_station INTEGER);";
 	
-	public DBAdapter(Context ctx) {
-		this.context = ctx;
-		DBHelper = new DatabaseHelper(context);
-	}
-	
-	private static class DatabaseHelper extends SQLiteOpenHelper {
-		DatabaseHelper(Context context) {
-			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		}
+	public static class DBHelper {
+		private SQLiteDatabase db;
 		
-		@Override
-		public void onCreate(SQLiteDatabase db) {
+		public void open() {
+			File dbDir = null;
+			File dbFile = null;
+			
+			if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+				dbDir = new File (Environment.getExternalStorageDirectory(), "." + DATABASE_NAME);
+				dbFile = new File(dbDir, DATABASE_NAME);
+			} else {
+				// code for showing error coz there's no sdcard
+			}
+			if (!dbDir.exists()) {
+				dbDir.mkdir();
+				Log.i("SQLiteHelper", "Created directory at " + dbDir);
+			}
+			if (dbFile.exists()) {
+				Log.i("SQLiteHelper", "Opening database at " + dbFile);
+				db = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
+				if (DATABASE_VERSION > db.getVersion()) {
+					upgrade();
+				}
+			} else {
+				Log.i("SQLiteHelper", "Creating database at " + dbFile);
+				db = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
+				Log.i("SQLiteHelper", "Opened database at " + dbFile);
+				create();
+			}
+		}
+    
+	    public void create() {
 			db.execSQL(AGENCYDB_CREATE);
 			db.execSQL(STOPSDB_CREATE);
 			
@@ -182,114 +194,110 @@ public class DBAdapter {
 			values.put("parent_station", "medvls0");
 			db.insert(STOPS_TABLE, null, values);
 			values.clear();
+			
+			db.setVersion(DATABASE_VERSION);
 		}
 		
-		@Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-                    + newVersion + ", which will destroy all old data");
-            db.execSQL("DROP TABLE IF EXISTS agencies");
-            onCreate(db);
+		public void upgrade() {
+			Log.w("" + this, "Upgrading database "+ db.getPath() + " from version " + db.getVersion() + " to "
+	                + DATABASE_VERSION + ", which will destroy all old data");
+	         db.execSQL("DROP TABLE IF EXISTS agencies");
+	         db.execSQL("DROP TABLE IF EXISTS stops");
+	         create();
 		}
-	}
 	
-	// opens the database
-	public DBAdapter open() throws SQLException {
-		db = DBHelper.getWritableDatabase();
-		return this;
-	}
+		// closes the database
+		public void close () {
+			db.close();
+		}
+		
+		// insert an agency into the database
+		public long insertAgency(String agency_id, String agency_name, String agency_url, String agency_timezone, String agency_lang, String agency_phone) {
+			ContentValues initialValues = new ContentValues();
+			initialValues.put(KEY_AGENCYID, agency_id);
+			initialValues.put(KEY_AGENCYNAME, agency_name);
+			initialValues.put(KEY_AGENCYURL, agency_url);
+			initialValues.put(KEY_AGENCYTIMEZONE, agency_timezone);
+			initialValues.put(KEY_AGENCYLANG, agency_lang);
+			initialValues.put(KEY_AGENCYPHONE, agency_phone);
+			return db.insert(AGENCIES_TABLE, null, initialValues);
+		}
+		
+		// deletes a particular agency
+		public boolean deleteAgency(long rowId) {
+			int agency = db.delete(AGENCIES_TABLE, KEY_ROWID + "=" + rowId, null);
+			int stops = db.delete(STOPS_TABLE, KEY_SAGENCYID + "=" + rowId, null);
+			return (agency + stops > 0);
+		}
+		
+		// deletes all agencies
+		public boolean deleteAllAgencies() {
+			int agency = db.delete(AGENCIES_TABLE, KEY_ROWID, null);
+			int stops = db.delete(STOPS_TABLE, KEY_STOPID, null);
+			return (agency + stops > 0);
+		}
+		
+		// retrieves all agencies
+		public Cursor getAllAgencies() {
+			return db.query(AGENCIES_TABLE, new String[] {
+					// importing only needed columns instead of all
+					KEY_ROWID,
+					KEY_AGENCYNAME},
+					null,
+					null,
+					null,
+					null,
+					null);				
+		}
+		
+		// retrieves a particular agency
+		public Cursor getAgency(long rowId) throws SQLException {
+			Cursor mCursor = 
+				db.query(true, AGENCIES_TABLE, new String[] {
+					KEY_ROWID,
+					KEY_AGENCYID,
+					KEY_AGENCYNAME,
+					KEY_AGENCYURL,
+					KEY_AGENCYTIMEZONE,
+					KEY_AGENCYLANG,
+					KEY_AGENCYPHONE}, 
+					KEY_ROWID + "=" + rowId,
+					null,
+					null,
+					null,
+					null,
+					null);
+			if (mCursor != null) {
+				mCursor.moveToFirst();
+			}
+			return mCursor;
+		}
+		
+		// updates an agency
+			public boolean updateAgency(long rowId, String agency_id, String agency_name, String agency_url, String agency_timezone, String agency_lang, String agency_phone) {
+			ContentValues args = new ContentValues();
+			args.put(KEY_AGENCYID, agency_id);
+			args.put(KEY_AGENCYNAME, agency_name);
+			args.put(KEY_AGENCYURL, agency_url);
+			args.put(KEY_AGENCYTIMEZONE, agency_timezone);
+			args.put(KEY_AGENCYLANG, agency_lang);
+			args.put(KEY_AGENCYPHONE, agency_phone);
+			return db.update(AGENCIES_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
+		}
 	
-	// closes the database
-	public void close () {
-		DBHelper.close();
-	}
-	
-	// insert an agency into the database
-	public long insertAgency(String agency_id, String agency_name, String agency_url, String agency_timezone, String agency_lang, String agency_phone) {
-		ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_AGENCYID, agency_id);
-		initialValues.put(KEY_AGENCYNAME, agency_name);
-		initialValues.put(KEY_AGENCYURL, agency_url);
-		initialValues.put(KEY_AGENCYTIMEZONE, agency_timezone);
-		initialValues.put(KEY_AGENCYLANG, agency_lang);
-		initialValues.put(KEY_AGENCYPHONE, agency_phone);
-		return db.insert(AGENCIES_TABLE, null, initialValues);
-	}
-	
-	// deletes a particular agency
-	public boolean deleteAgency(long rowId) {
-		int agency = db.delete(AGENCIES_TABLE, KEY_ROWID + "=" + rowId, null);
-		int stops = db.delete(STOPS_TABLE, KEY_SAGENCYID + "=" + rowId, null);
-		return (agency + stops > 0);
-	}
-	
-	// deletes all agencies
-	public boolean deleteAllAgencies() {
-		int agency = db.delete(AGENCIES_TABLE, KEY_ROWID, null);
-		int stops = db.delete(STOPS_TABLE, KEY_STOPID, null);
-		return (agency + stops > 0);
-	}
-	
-	// retrieves all agencies
-	public Cursor getAllAgencies() {
-		return db.query(AGENCIES_TABLE, new String[] {
-				// importing only needed columns instead of all
-				KEY_ROWID,
-				KEY_AGENCYNAME},
-				null,
-				null,
-				null,
-				null,
-				null);				
-	}
-	
-	// retrieves a particular agency
-	public Cursor getAgency(long rowId) throws SQLException {
-		Cursor mCursor = 
-			db.query(true, AGENCIES_TABLE, new String[] {
-				KEY_ROWID,
-				KEY_AGENCYID,
-				KEY_AGENCYNAME,
-				KEY_AGENCYURL,
-				KEY_AGENCYTIMEZONE,
-				KEY_AGENCYLANG,
-				KEY_AGENCYPHONE}, 
-				KEY_ROWID + "=" + rowId,
+	public Cursor getAllStops(long rowId) throws SQLException {
+		return	db.query(STOPS_TABLE, new String[] {
+				KEY_STOPID,
+				KEY_SAGENCYID,
+				KEY_STOPCODE,
+				KEY_STOPNAME,
+				KEY_STOPDESC}, 
+				KEY_SAGENCYID + "=" + rowId,
 				null,
 				null,
 				null,
 				null,
 				null);
-		if (mCursor != null) {
-			mCursor.moveToFirst();
 		}
-		return mCursor;
-	}
-	
-	// updates an agency
-		public boolean updateAgency(long rowId, String agency_id, String agency_name, String agency_url, String agency_timezone, String agency_lang, String agency_phone) {
-		ContentValues args = new ContentValues();
-		args.put(KEY_AGENCYID, agency_id);
-		args.put(KEY_AGENCYNAME, agency_name);
-		args.put(KEY_AGENCYURL, agency_url);
-		args.put(KEY_AGENCYTIMEZONE, agency_timezone);
-		args.put(KEY_AGENCYLANG, agency_lang);
-		args.put(KEY_AGENCYPHONE, agency_phone);
-		return db.update(AGENCIES_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
-	}
-
-public Cursor getStops(long rowId) throws SQLException {
-	return	db.query(STOPS_TABLE, new String[] {
-			KEY_STOPID,
-			KEY_SAGENCYID,
-			KEY_STOPCODE,
-			KEY_STOPNAME,
-			KEY_STOPDESC}, 
-			KEY_SAGENCYID + "=" + rowId,
-			null,
-			null,
-			null,
-			null,
-			null);
 	}
 }
