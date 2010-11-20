@@ -8,19 +8,16 @@
 	<EditText 
 		android:id="@+id/agencyname" 
 	 	android:layout_width="wrap_content"
-		android:layout_height="wrap_content" 
-		android:layout_weight="1"/>
+		android:layout_height="wrap_content" />
 	<EditText 
 		android:id="@+id/agencyurl" 
 	 	android:layout_width="wrap_content"
-		android:layout_height="wrap_content" 
-		android:layout_weight="1"
+		android:layout_height="wrap_content"
 		android:layout_below="@id/agencyname"/>
 	<EditText 
 		android:id="@+id/agencytz" 
 	 	android:layout_width="wrap_content"
-		android:layout_height="wrap_content" 
-		android:layout_weight="1"
+		android:layout_height="wrap_content"
 		android:layout_below="@id/agencyurl"/>
 
 </RelativeLayout>

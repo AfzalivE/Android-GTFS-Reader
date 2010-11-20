@@ -54,6 +54,7 @@ public class AgencyDetails extends ListActivity {
 		rowId = getIntent().getLongExtra(DBAdapter.KEY_ROWID, 0);
 		db.open();
 		agencyCursor = db.getAgency(rowId);
+		startManagingCursor(agencyCursor);
 		db.close();
 		
 		if (agencyCursor.getCount() == 1) {

@@ -63,7 +63,7 @@ public class AgencyList extends ListActivity {
     @Override
     protected void onPause() {
         stopManagingCursor(agencyCursor);
- //     agencyCursor.close();
+  //      agencyCursor.close();
         super.onPause();
     }
  
@@ -72,13 +72,7 @@ public class AgencyList extends ListActivity {
         DisplayAgencies();
         super.onResume();
     }
-    
-    @Override
-    protected void onDestroy () {
-//      agencyCursor.close();
-    	db.close();
-    }
-    
+   
     public void DisplayAgencies() {
         // open db
         db.open();
@@ -188,6 +182,7 @@ public class AgencyList extends ListActivity {
     	    	Intent i1 = new Intent(this, AgencyEdit.class);
     	    	i1.putExtra("_id", info1.id);
     	    	startActivityForResult(i1, ACTIVITY_EDIT);
+    	    	return true;
     	    	
 	    	case DELETE_ID:
 	    		db.open();

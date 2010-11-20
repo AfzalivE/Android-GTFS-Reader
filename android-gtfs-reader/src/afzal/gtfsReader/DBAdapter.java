@@ -91,7 +91,7 @@ public class DBAdapter {
 			File dbFile = null;
 			
 			if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-				dbDir = new File (Environment.getExternalStorageDirectory(), "." + DATABASE_NAME);
+				dbDir = new File (Environment.getExternalStorageDirectory(), /*"." + */DATABASE_NAME);
 				dbFile = new File(dbDir, DATABASE_NAME);
 			} else {
 				// code for showing error coz there's no sdcard
