@@ -21,6 +21,22 @@
  *	
  ******** END LICENSE BLOCK ******/
 
+/* ******* FILE HEADER ******
+ * 
+ * File: DBAdapter.java
+ * ---------------------
+ * Contains all the methods 
+ * for database manipulation
+ * required by this app.
+ * ----------------------
+ * All methods from this file
+ * are to be used in other files
+ * as this file in itself is not
+ * an Activity.
+ * 
+ ****************************/
+
+
 package afzal.gtfsReader;
 
 import java.io.File;
@@ -33,13 +49,18 @@ import android.os.Environment;
 import android.util.Log;
 
 public class DBAdapter {
-	// DB File strings	
+	
+/* Start DB strings */	
+	
 	private static final String DATABASE_NAME = "gtfs";
 	private static final String AGENCIES_TABLE = "agencies";
 	private static final String STOPS_TABLE = "stops";
 	private static final int DATABASE_VERSION = 1;
 	
-	// Agency List strings
+/* End DB strings */
+	
+/* Start Agency List strings */
+	
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_AGENCYID = "agency_id";
 	public static final String KEY_AGENCYNAME = "agency_name";
@@ -48,7 +69,10 @@ public class DBAdapter {
 	public static final String KEY_AGENCYLANG = "agency_lang";
 	public static final String KEY_AGENCYPHONE = "agency_phone";
 	
-	// Stop list strings
+/* End Agency List strings */
+	
+/* Start Stop list strings */
+	
 	public static final String KEY_STOPID = "_id";
 	public static final String KEY_SAGENCYID = "sagency_id"; 
 	public static final String KEY_STOPCODE = "stop_code";
@@ -60,7 +84,11 @@ public class DBAdapter {
 	public static final String KEY_STOPURL = "stop_url";
 	public static final String KEY_LOCATIONTYPE = "location_type";
 	public static final String KEY_PARENTSTATION = "parent_station";
-
+	
+/* End Stop list strings */
+	
+/* Start Table creation strings */
+	
 	private static final String AGENCYDB_CREATE =
 		"create table agencies (_id INTEGER primary key autoincrement, "
 		+ "agency_id TEXT, "
@@ -83,6 +111,9 @@ public class DBAdapter {
 		+ "location_type BOOL, "
 		+ "parent_station INTEGER);";
 	
+/* End Table creation strings */
+
+
 	public static class DBHelper {
 		private SQLiteDatabase db;
 		
@@ -90,22 +121,30 @@ public class DBAdapter {
 			File dbDir = null;
 			File dbFile = null;
 			
+// Detect if there's an SD Card present and create folder (for db) in it if true 
+			
 			if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 				dbDir = new File (Environment.getExternalStorageDirectory(), /*"." + */DATABASE_NAME);
 				dbFile = new File(dbDir, DATABASE_NAME);
 			} else {
 				// code for showing error coz there's no sdcard
 			}
+			
+// If the db folder doesn't exist already, create it
 			if (!dbDir.exists()) {
 				dbDir.mkdir();
 				Log.i("SQLiteHelper", "Created directory at " + dbDir);
 			}
+			
+// If the db file already exists, open the database and update if older version
 			if (dbFile.exists()) {
 				Log.i("SQLiteHelper", "Opening database at " + dbFile);
 				db = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
 				if (DATABASE_VERSION > db.getVersion()) {
 					upgrade();
 				}
+				
+// If the db file doesn't exist then create it				
 			} else {
 				Log.i("SQLiteHelper", "Creating database at " + dbFile);
 				db = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
@@ -113,7 +152,15 @@ public class DBAdapter {
 				create();
 			}
 		}
-    
+
+/* **** METHOD HEADER *******
+ * 
+ * Usage: create()
+ * ---------------
+ * Use to create the initial tables
+ * 
+ */
+		
 	    public void create() {
 			db.execSQL(AGENCYDB_CREATE);
 			db.execSQL(STOPSDB_CREATE);
@@ -198,6 +245,19 @@ public class DBAdapter {
 			db.setVersion(DATABASE_VERSION);
 		}
 		
+/* **** METHOD HEADER *******
+ * 
+ * Usage: DB.upgrade()
+ * ---------------
+ * Use to upgrade the db
+ * ---------------------
+ * DB is a DBHelper object here
+ * db is a SQLiteDatabase
+ * 
+ * (Note the upper/lower cases)
+ * 
+ */
+	    
 		public void upgrade() {
 			Log.w("" + this, "Upgrading database "+ db.getPath() + " from version " + db.getVersion() + " to "
 	                + DATABASE_VERSION + ", which will destroy all old data");
@@ -206,8 +266,20 @@ public class DBAdapter {
 	         create();
 		}
 	
-		// closes the database
-		public void close () {
+/* **** METHOD HEADER *******
+ * 
+ * Usage: DB.close()
+ * ---------------
+ * Use to close the db
+ * ---------------
+ * DB is a DBHelper object here
+ * db is a SQLiteDatabase
+ * 
+ * (Note the upper/lower cases)
+ * 
+ */
+		
+		public void close() {
 			db.close();
 		}
 		
@@ -223,21 +295,65 @@ public class DBAdapter {
 			return db.insert(AGENCIES_TABLE, null, initialValues);
 		}
 		
-		// deletes a particular agency
+/* **** METHOD HEADER *******
+ * 
+ * Usage: DB.deleteAgency(rowId)
+ * -----------------------------
+ * Use to delete an entry from
+ * the Agency table and its 
+ * corresponding stop entries
+ * and return true if deleted
+ * ---------------------------
+ * DB is a DBHelper object here
+ * db is a SQLiteDatabase
+ * 
+ * (Note the upper/lower cases)
+ * 
+ */
+
 		public boolean deleteAgency(long rowId) {
 			int agency = db.delete(AGENCIES_TABLE, KEY_ROWID + "=" + rowId, null);
 			int stops = db.delete(STOPS_TABLE, KEY_SAGENCYID + "=" + rowId, null);
 			return (agency + stops > 0);
 		}
-		
-		// deletes all agencies
+
+/* **** METHOD HEADER *******
+ * 
+ * Usage: DB.deleteAllAgencies()
+ * -----------------------------
+ * Use to delete all entries
+ * from the Agency and stops table 
+ * and return true if deleted
+ * -----------------------------
+ * DB is a DBHelper object here
+ * db is a SQLiteDatabase
+ * 
+ * (Note the upper/lower cases)
+ * 
+ */
+	
 		public boolean deleteAllAgencies() {
 			int agency = db.delete(AGENCIES_TABLE, KEY_ROWID, null);
 			int stops = db.delete(STOPS_TABLE, KEY_STOPID, null);
 			return (agency + stops > 0);
 		}
 		
-		// retrieves all agencies
+/* **** METHOD HEADER *******
+ * 
+ * Usage: DB.getAllAgencies()
+ * --------------------------
+ * Use to obtain all entries
+ * from the Agency table to a
+ * cursor, only returns their
+ * _id and agencyname (for list)
+ * -----------------------------
+ * DB is a DBHelper object here
+ * db is a SQLiteDatabase
+ * 
+ * (Note the upper/lower cases)
+ * 
+ */
+		
 		public Cursor getAllAgencies() {
 			return db.query(AGENCIES_TABLE, new String[] {
 					// importing only needed columns instead of all
@@ -250,7 +366,22 @@ public class DBAdapter {
 					null);				
 		}
 		
-		// retrieves a particular agency
+/* **** METHOD HEADER *******
+ * 
+ * Usage: DB.getAgency(rowId)
+ * ---------------------------
+ * Use to obtain an entry from
+ * the Agency table to a cursor.
+ * Returns all the data in the
+ * row to a cursor.
+ * -----------------------------
+ * DB is a DBHelper object here
+ * db is a SQLiteDatabase
+ * 
+ * (Note the upper/lower cases)
+ * 
+ */
+		
 		public Cursor getAgency(long rowId) throws SQLException {
 			Cursor mCursor = 
 				db.query(true, AGENCIES_TABLE, new String[] {
@@ -273,7 +404,21 @@ public class DBAdapter {
 			return mCursor;
 		}
 		
-		// updates an agency
+/* **** METHOD HEADER *******
+ * 
+ * Usage: DB.updateAgency(rowId, agency_id, agency_name, agency_url, agency_timezone, agency_lang, agency_phone)
+ * -------------------------------------------------------------------------------------------------------------
+ * Use to change columns in a 
+ * row of data in the Agency table.
+ * Returns true if successful.
+ * -------------------------------
+ * DB is a DBHelper object here
+ * db is a SQLiteDatabase
+ * 
+ * (Note the upper/lower cases)
+ * 
+ */
+
 			public boolean updateAgency(long rowId, String agency_id, String agency_name, String agency_url, String agency_timezone, String agency_lang, String agency_phone) {
 			ContentValues args = new ContentValues();
 			args.put(KEY_AGENCYID, agency_id);
@@ -285,6 +430,23 @@ public class DBAdapter {
 			return db.update(AGENCIES_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
 		}
 	
+/* **** METHOD HEADER *******
+ * 
+ * Usage: DB.getAllStops(rowId)
+ * -----------------------------
+ * Use to obtain all stops with the
+ * same sagencyid to a cursor.
+ * -------------------------------
+ * sagencyid is the rowId of the
+ * Agency.
+ * 
+ * DB is a DBHelper object here
+ * db is a SQLiteDatabase
+ * 
+ * (Note the upper/lower cases)
+ * 
+ */
+			
 	public Cursor getAllStops(long rowId) throws SQLException {
 		return	db.query(STOPS_TABLE, new String[] {
 				KEY_STOPID,
