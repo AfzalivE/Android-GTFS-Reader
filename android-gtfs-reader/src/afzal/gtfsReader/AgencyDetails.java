@@ -80,7 +80,7 @@ public class AgencyDetails extends ListActivity {
     protected void onStop() {
         stopManagingCursor(agencyCursor);
         agencyCursor.close();
-        super.onPause();
+        super.onStop();
     }
     
 //    @Override

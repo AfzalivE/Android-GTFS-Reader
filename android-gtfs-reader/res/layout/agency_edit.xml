@@ -4,20 +4,41 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:padding="8px">
-
-	<EditText 
-		android:id="@+id/agencyname" 
-	 	android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
-	<EditText 
-		android:id="@+id/agencyurl" 
-	 	android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_below="@id/agencyname"/>
-	<EditText 
-		android:id="@+id/agencytz" 
-	 	android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_below="@id/agencyurl"/>
+    	<TextView
+    		android:id="@+id/txtagencyname"
+    		android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text = "Agency Name" />
+		<EditText 
+			android:id="@+id/agencyname" 
+		 	android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toRightOf="@id/txtagencyname" />
+		<EditText 
+			android:id="@+id/agencyurl" 
+		 	android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/agencyname"/>
+		<EditText 
+			android:id="@+id/agencytz" 
+		 	android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/agencyurl"/>
+		<EditText
+			android:id="@+id/agencyph"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/agencytz" />
+			
+		<EditText 
+			android:id="@+id/agencyid" 
+		 	android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/agencyph"/>
+		<EditText
+			android:id="@+id/agencylan"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/agencyid" />
 
 </RelativeLayout>

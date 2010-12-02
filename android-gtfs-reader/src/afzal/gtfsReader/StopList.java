@@ -32,6 +32,7 @@ import android.widget.SimpleCursorAdapter;
 public class StopList extends ListActivity {
 	private DBHelper db = new DBHelper();
 	private Long rowId;
+	private String agency_name;
 	private Cursor stopCursor;
 	
     @Override
@@ -40,6 +41,8 @@ public class StopList extends ListActivity {
         setContentView(R.layout.main);
         
         rowId = getIntent().getLongExtra(DBAdapter.KEY_SAGENCYID, 0);
+        /* Need to import agency_name to StopList intent somehow ... thru agencyCursor maybe? */
+        agency_name = getIntent().getStringExtra(DBAdapter.KEY_AGENCYNAME);
         
         DisplayStops(rowId);
 //    	registerForContextMenu(getListView());
@@ -50,7 +53,7 @@ public class StopList extends ListActivity {
     protected void onStop() {
         stopManagingCursor(stopCursor);
         stopCursor.close();
-        super.onPause();
+        super.onStop();
     }
     
 //    @Override
@@ -60,6 +63,7 @@ public class StopList extends ListActivity {
     
     public void DisplayStops(long rowId) {
         // open db
+    	setTitle(agency_name);
         db.open();
     	// Get all of the rows from the database
     	// and create the item list

@@ -16,6 +16,7 @@ public class AgencyEdit extends Activity {
 	private EditText AgencyName;
 	private EditText AgencyURL;
 	private EditText AgencyTimezone;
+	private EditText AgencyPhone;
 	private Long rowId;
 	private Cursor agencyCursor;
 	private DBHelper db = new DBHelper();
@@ -28,6 +29,7 @@ public class AgencyEdit extends Activity {
 		AgencyName = (EditText) findViewById(R.id.agencyname);
 		AgencyURL = (EditText) findViewById(R.id.agencyurl);
 		AgencyTimezone = (EditText) findViewById(R.id.agencytz);
+		AgencyPhone = (EditText) findViewById(R.id.agencyph);
 		
 		rowId = getIntent().getLongExtra(DBAdapter.KEY_ROWID, 0);
 		db.open();
@@ -41,9 +43,13 @@ public class AgencyEdit extends Activity {
 			Log.i("AgencyEdit", "name obtained");
 			String url = agencyCursor.getString(agencyCursor.getColumnIndex("agency_url"));
 			String tz = agencyCursor.getString(agencyCursor.getColumnIndex("agency_timezone"));
+			String ph = agencyCursor.getString(agencyCursor.getColumnIndex("agency_phone"));
 			AgencyName.setText(name);
 			AgencyURL.setText(url);
 			AgencyTimezone.setText(tz);
+			AgencyPhone.setText(ph);
+			
+			/* Need to style this file */
 		}
 	}
     
@@ -63,13 +69,14 @@ public class AgencyEdit extends Activity {
                 bundle.putString(DBAdapter.KEY_AGENCYNAME, AgencyName.getText().toString());
                 bundle.putString(DBAdapter.KEY_AGENCYURL, AgencyURL.getText().toString());
                 bundle.putString(DBAdapter.KEY_AGENCYTIMEZONE, AgencyTimezone.getText().toString());
+                bundle.putString(DBAdapter.KEY_AGENCYPHONE, AgencyPhone.getText().toString());
                 bundle.putLong(DBAdapter.KEY_ROWID, rowId);
                 Intent i = new Intent();
                 i.putExtras(bundle);
                 setResult(RESULT_OK, i);
                 finish();
-
 	        case CANCEL:
+	        	setResult(RESULT_CANCELED);
 	        	finish();
     		
         }

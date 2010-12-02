@@ -138,7 +138,7 @@ public class DBAdapter {
 			
 // If the db file already exists, open the database and update if older version
 			if (dbFile.exists()) {
-				Log.i("SQLiteHelper", "Opening database at " + dbFile);
+				Log.i("SQLiteHelper", "Opening only database at " + dbFile);
 				db = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
 				if (DATABASE_VERSION > db.getVersion()) {
 					upgrade();

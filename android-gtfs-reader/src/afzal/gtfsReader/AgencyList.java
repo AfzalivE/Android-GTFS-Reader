@@ -124,10 +124,11 @@ public class AgencyList extends ListActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        Bundle extras = intent.getExtras();
+        Bundle extras;
         db.open();
         switch(requestCode) {
         case ACTIVITY_CREATE:
+        	extras = intent.getExtras();
             String name = extras.getString(DBAdapter.KEY_AGENCYNAME);
 			String url = extras.getString(DBAdapter.KEY_AGENCYURL);
 			String tz = extras.getString(DBAdapter.KEY_AGENCYTIMEZONE);
@@ -142,19 +143,23 @@ public class AgencyList extends ListActivity {
             break;
             
         case ACTIVITY_EDIT:
-            Long rowId = extras.getLong(DBAdapter.KEY_ROWID);
-            if (rowId != null) {
-                String editname = extras.getString(DBAdapter.KEY_AGENCYNAME);
-    			String editurl = extras.getString(DBAdapter.KEY_AGENCYURL);
-    			String edittz = extras.getString(DBAdapter.KEY_AGENCYTIMEZONE);
-                db.updateAgency(
-                		rowId, 
-                		"", 
-                		editname, 
-                		editurl, 
-                		edittz, 
-                		"", 
-                		"");
+            if (resultCode == RESULT_OK) {
+            	extras = intent.getExtras();
+                Long rowId = extras.getLong(DBAdapter.KEY_ROWID);
+            	if (rowId != null) {
+	            	String editname = extras.getString(DBAdapter.KEY_AGENCYNAME);
+	    			String editurl = extras.getString(DBAdapter.KEY_AGENCYURL);
+	    			String edittz = extras.getString(DBAdapter.KEY_AGENCYTIMEZONE);
+	    			String editph = extras.getString(DBAdapter.KEY_AGENCYPHONE);
+	    			db.updateAgency(
+	                		rowId, 
+	                		null, 
+	                		editname, 
+	                		editurl, 
+	                		edittz, 
+	                		null,
+	                		editph);
+	            }
             }
             DisplayAgencies();
             break;
@@ -173,33 +178,36 @@ public class AgencyList extends ListActivity {
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+    	Intent i;
+    	AdapterContextMenuInfo info;
+    	Cursor c;
     	switch(item.getItemId()) {
     		case EDIT_ID:
-    			Cursor c1 = agencyCursor;
-    			startManagingCursor(c1);
-    			AdapterContextMenuInfo info1 = (AdapterContextMenuInfo) item.getMenuInfo();
-    			c1.moveToPosition(info1.position);
-    	    	Intent i1 = new Intent(this, AgencyEdit.class);
-    	    	i1.putExtra("_id", info1.id);
-    	    	startActivityForResult(i1, ACTIVITY_EDIT);
+    			c = agencyCursor;
+    			startManagingCursor(c);
+    			info = (AdapterContextMenuInfo) item.getMenuInfo();
+    			c.moveToPosition(info.position);
+    	    	i = new Intent(this, AgencyEdit.class);
+    	    	i.putExtra("_id", info.id);
+    	    	startActivityForResult(i, ACTIVITY_EDIT);
     	    	return true;
     	    	
 	    	case DELETE_ID:
 	    		db.open();
-	    		AdapterContextMenuInfo info2 = (AdapterContextMenuInfo) item.getMenuInfo();
-	    		db.deleteAgency(info2.id);
+	    		info = (AdapterContextMenuInfo) item.getMenuInfo();
+	    		db.deleteAgency(info.id);
 	    		DisplayAgencies();
 	    		db.close();
 	    		return true;
 	    		
 	    	case DETAIL:
-	    		Cursor c2 = agencyCursor;
-	            startManagingCursor(c2);
-	    		AdapterContextMenuInfo info3 = (AdapterContextMenuInfo) item.getMenuInfo();
-				c2.moveToPosition(info3.position);
-	        	Intent i2 = new Intent(this, AgencyDetails.class);
-				i2.putExtra("_id", info3.id);
-	            startActivity(i2);    
+	    		c = agencyCursor;
+	            startManagingCursor(c);
+	    		info = (AdapterContextMenuInfo) item.getMenuInfo();
+				c.moveToPosition(info.position);
+	        	i = new Intent(this, AgencyDetails.class);
+				i.putExtra("_id", info.id);
+	            startActivity(i);    
 	            return true;
     	}
     	return super.onContextItemSelected(item);
