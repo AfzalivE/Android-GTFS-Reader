@@ -27,6 +27,7 @@ import afzal.gtfsReader.DBAdapter.DBHelper;
 import android.app.ListActivity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 public class StopList extends ListActivity {
@@ -40,9 +41,10 @@ public class StopList extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        rowId = getIntent().getLongExtra(DBAdapter.KEY_SAGENCYID, 0);
+        Bundle extras = getIntent().getExtras();
+        rowId = extras.getLong(DBAdapter.KEY_SAGENCYID);
         /* Need to import agency_name to StopList intent somehow ... thru agencyCursor maybe? */
-        agency_name = getIntent().getStringExtra(DBAdapter.KEY_AGENCYNAME);
+        agency_name = extras.getString(DBAdapter.KEY_AGENCYNAME);
         
         DisplayStops(rowId);
 //    	registerForContextMenu(getListView());
@@ -56,10 +58,12 @@ public class StopList extends ListActivity {
         super.onStop();
     }
     
-//    @Override
-//    protected void onDestroy () {
-//    	db.close();
-//    }
+    @Override
+    protected void onDestroy () {
+        stopManagingCursor(stopCursor);
+        stopCursor.close();
+        super.onDestroy();
+    }
     
     public void DisplayStops(long rowId) {
         // open db
@@ -79,6 +83,11 @@ public class StopList extends ListActivity {
     	// Simple cursor adapter; set to display
     	SimpleCursorAdapter stops = new SimpleCursorAdapter(this, R.layout.stop_list_item, stopCursor, from, to);
     	setListAdapter(stops);
+    	
+    	// Have to implement filtering using this
+/*    	ListView lv = getListView();
+    	lv.setTextFilterEnabled(true); */
+    	
     	// close db
     	db.close();
     }

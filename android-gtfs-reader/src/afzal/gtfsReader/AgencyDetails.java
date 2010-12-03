@@ -83,11 +83,13 @@ public class AgencyDetails extends ListActivity {
         super.onStop();
     }
     
-//    @Override
-//    protected void onDestroy () {
-//    	db.close();
-//    }
-//	
+    @Override
+    protected void onDestroy () {
+	    stopManagingCursor(agencyCursor);
+	    agencyCursor.close();
+	    super.onDestroy();
+    }
+	
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		AgencyAction action = actions.get(position);
 		
