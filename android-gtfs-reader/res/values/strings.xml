@@ -10,4 +10,8 @@
     
     <string name="menu_new">New</string>
     <string name="menu_edit">Edit</string>
+    <string name="menu_save">Save</string>
+    <string name="cancel">Cancel</string>
+    
+    <string name="edit_agency">Edit Agency</string>
 </resources>

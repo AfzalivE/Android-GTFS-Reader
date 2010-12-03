@@ -63,7 +63,11 @@ public class AgencyList extends ListActivity {
     @Override
     protected void onPause() {
         stopManagingCursor(agencyCursor);
-  //      agencyCursor.close();
+        
+        // This is to avoid "Invalid statement in FillWindow()" Error
+        // Find out how to copy the contents of SimpleCursorAdapter
+        // to a temporary variable which doesn't need to close
+//      agencyCursor.close();
         super.onPause();
     }
  
@@ -116,7 +120,7 @@ public class AgencyList extends ListActivity {
     }
     
     private void createAgency() {
-		Intent i = new Intent(this,AgencyEdit.class);
+    	Intent i = new Intent(this,AgencyEdit.class);
 		startActivityForResult(i, ACTIVITY_CREATE);
 		
 	}
@@ -125,44 +129,55 @@ public class AgencyList extends ListActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         Bundle extras;
-        db.open();
+        String id, name, url, tz, lang, ph;
         switch(requestCode) {
         case ACTIVITY_CREATE:
-        	extras = intent.getExtras();
-            String name = extras.getString(DBAdapter.KEY_AGENCYNAME);
-			String url = extras.getString(DBAdapter.KEY_AGENCYURL);
-			String tz = extras.getString(DBAdapter.KEY_AGENCYTIMEZONE);
-    		db.insertAgency(
-    				"", 
-    				name, 
-    				url, 
-    				tz, 
-    				"" , 
-    				"");
-            DisplayAgencies();
-            break;
+        	  if (resultCode == RESULT_OK) {
+        		db.open();
+              	extras = intent.getExtras();
+	        	id = extras.getString(DBAdapter.KEY_AGENCYID);
+	            name = extras.getString(DBAdapter.KEY_AGENCYNAME);
+				url = extras.getString(DBAdapter.KEY_AGENCYURL);
+				tz = extras.getString(DBAdapter.KEY_AGENCYTIMEZONE);
+				lang = extras.getString(DBAdapter.KEY_AGENCYLANG);
+				ph = extras.getString(DBAdapter.KEY_AGENCYPHONE);
+	    		db.insertAgency(
+	    				id, 
+	    				name, 
+	    				url, 
+	    				tz, 
+	    				lang, 
+	    				ph);
+	    		db.close();
+	            DisplayAgencies();
+	            break;
+        	  }
             
         case ACTIVITY_EDIT:
             if (resultCode == RESULT_OK) {
             	extras = intent.getExtras();
                 Long rowId = extras.getLong(DBAdapter.KEY_ROWID);
             	if (rowId != null) {
-	            	String editname = extras.getString(DBAdapter.KEY_AGENCYNAME);
-	    			String editurl = extras.getString(DBAdapter.KEY_AGENCYURL);
-	    			String edittz = extras.getString(DBAdapter.KEY_AGENCYTIMEZONE);
-	    			String editph = extras.getString(DBAdapter.KEY_AGENCYPHONE);
+            		db.open();
+            		id = extras.getString(DBAdapter.KEY_AGENCYID);
+	            	name = extras.getString(DBAdapter.KEY_AGENCYNAME);
+	    			url = extras.getString(DBAdapter.KEY_AGENCYURL);
+	    			tz = extras.getString(DBAdapter.KEY_AGENCYTIMEZONE);
+	    			lang = extras.getString(DBAdapter.KEY_AGENCYLANG);
+	    			ph = extras.getString(DBAdapter.KEY_AGENCYPHONE);
 	    			db.updateAgency(
 	                		rowId, 
-	                		null, 
-	                		editname, 
-	                		editurl, 
-	                		edittz, 
-	                		null,
-	                		editph);
+	                		id, 
+	                		name, 
+	                		url, 
+	                		tz, 
+	                		lang,
+	                		ph);
+	    			db.close();
+	                DisplayAgencies();
+	                break;
 	            }
             }
-            DisplayAgencies();
-            break;
         }
     }
 
@@ -188,7 +203,7 @@ public class AgencyList extends ListActivity {
     			info = (AdapterContextMenuInfo) item.getMenuInfo();
     			c.moveToPosition(info.position);
     	    	i = new Intent(this, AgencyEdit.class);
-    	    	i.putExtra("_id", info.id);
+    	    	i.putExtra(DBAdapter.KEY_AGENCYID, info.id);
     	    	startActivityForResult(i, ACTIVITY_EDIT);
     	    	return true;
     	    	
@@ -219,7 +234,11 @@ public class AgencyList extends ListActivity {
         startManagingCursor(c);
     	c.moveToPosition(position);
     	Intent i = new Intent(this, StopList.class);
-    	i.putExtra("sagency_id", id);
+    	i.putExtra(DBAdapter.KEY_SAGENCYID, id);
+
+    	// Need to display Agency Name on the title of stop list.
+    	String agency_name = DBAdapter.KEY_AGENCYNAME;
+    	i.putExtra(DBAdapter.KEY_AGENCYNAME, agency_name);
         startActivity(i);
     }
 

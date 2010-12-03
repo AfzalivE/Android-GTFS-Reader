@@ -1,3 +1,26 @@
+/****** BEGIN LICENSE BLOCK *****
+ *	Version: MPL 1.1
+ *	
+ *	The contents of this file are subject to the Mozilla Public License Version 
+ *	1.1 (the "License"); you may not use this file except in compliance with 
+ *	the License. You may obtain a copy of the License at 
+ *	http://www.mozilla.org/MPL/
+ *	
+ *	Software distributed under the License is distributed on an "AS IS" basis,
+ *	WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ *	for the specific language governing rights and limitations under the
+ *	License.
+ *	
+ *	The Original Code is located at http://code.google.com/p/android-gtfs-reader/
+ *	
+ *	The Initial Developer of the Original Code is
+ *	Afzal Najam <afzal.naj@gmail.com>
+ *	
+ *	Portions created by the Initial Developer are Copyright (C) 2010
+ *	Afzal Najam. All Rights Reserved.
+ *	
+ ******** END LICENSE BLOCK ******/
+
 package afzal.gtfsReader;
 
 import afzal.gtfsReader.DBAdapter.DBHelper;
@@ -17,6 +40,8 @@ public class AgencyEdit extends Activity {
 	private EditText AgencyURL;
 	private EditText AgencyTimezone;
 	private EditText AgencyPhone;
+	private EditText AgencyId;
+	private EditText AgencyLang;
 	private Long rowId;
 	private Cursor agencyCursor;
 	private DBHelper db = new DBHelper();
@@ -25,39 +50,61 @@ public class AgencyEdit extends Activity {
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.agency_edit);
+		setTitle(R.string.edit_agency);
 		
 		AgencyName = (EditText) findViewById(R.id.agencyname);
 		AgencyURL = (EditText) findViewById(R.id.agencyurl);
 		AgencyTimezone = (EditText) findViewById(R.id.agencytz);
 		AgencyPhone = (EditText) findViewById(R.id.agencyph);
+		AgencyId = (EditText) findViewById(R.id.agencyid);
+		AgencyLang = (EditText) findViewById(R.id.agencylang);
 		
-		rowId = getIntent().getLongExtra(DBAdapter.KEY_ROWID, 0);
-		db.open();
-		Log.i("AgencyEdit", "Opening database");
-		agencyCursor = db.getAgency(rowId);
-		startManagingCursor(agencyCursor);
-		db.close();	
-		
-		if (agencyCursor.getCount() == 1) {
+		rowId = null;
+		Bundle extras = getIntent().getExtras();
+
+		if (extras != null) {
+			rowId = extras.getLong(DBAdapter.KEY_AGENCYID);
+			db.open();
+			Log.i("AgencyEdit", "Opening database");
+			agencyCursor = db.getAgency(rowId);
+			startManagingCursor(agencyCursor);
+			db.close();
+			
 			String name = agencyCursor.getString(agencyCursor.getColumnIndex("agency_name"));
 			Log.i("AgencyEdit", "name obtained");
 			String url = agencyCursor.getString(agencyCursor.getColumnIndex("agency_url"));
 			String tz = agencyCursor.getString(agencyCursor.getColumnIndex("agency_timezone"));
 			String ph = agencyCursor.getString(agencyCursor.getColumnIndex("agency_phone"));
+			String id = agencyCursor.getString(agencyCursor.getColumnIndex("agency_id"));
+			String lang = agencyCursor.getString(agencyCursor.getColumnIndex("agency_lang"));
 			AgencyName.setText(name);
 			AgencyURL.setText(url);
 			AgencyTimezone.setText(tz);
 			AgencyPhone.setText(ph);
-			
-			/* Need to style this file */
+			AgencyId.setText(id);
+			AgencyLang.setText(lang);
 		}
 	}
+	
+    @Override
+    protected void onStop() {
+        stopManagingCursor(agencyCursor);
+        agencyCursor.close();
+        super.onStop();
+    }
+    
+    @Override
+    protected void onDestroy () {
+	    stopManagingCursor(agencyCursor);
+	    agencyCursor.close();
+	    super.onDestroy();
+    }
     
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, SAVE_AGENCY, 0, "Save");
-        menu.add(0, CANCEL, 0, "Cancel");
+        menu.add(0, SAVE_AGENCY, 0, R.string.menu_save);
+        menu.add(0, CANCEL, 0, R.string.cancel);
         return true;
     }
 	
@@ -70,7 +117,11 @@ public class AgencyEdit extends Activity {
                 bundle.putString(DBAdapter.KEY_AGENCYURL, AgencyURL.getText().toString());
                 bundle.putString(DBAdapter.KEY_AGENCYTIMEZONE, AgencyTimezone.getText().toString());
                 bundle.putString(DBAdapter.KEY_AGENCYPHONE, AgencyPhone.getText().toString());
-                bundle.putLong(DBAdapter.KEY_ROWID, rowId);
+                bundle.putString(DBAdapter.KEY_AGENCYID, AgencyId.getText().toString());
+                bundle.putString(DBAdapter.KEY_AGENCYLANG, AgencyLang.getText().toString());
+                if (rowId != null) {
+                	bundle.putLong(DBAdapter.KEY_ROWID, rowId);
+                }
                 Intent i = new Intent();
                 i.putExtras(bundle);
                 setResult(RESULT_OK, i);
