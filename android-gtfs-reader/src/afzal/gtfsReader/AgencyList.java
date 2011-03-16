@@ -84,6 +84,7 @@ public class AgencyList extends ListActivity {
     	// and create the item list
     	agencyCursor = db.getAllAgencies();
     	startManagingCursor(agencyCursor);
+    	
 
     	// array to specify the fields to display in the list
     	String[] from = new String[]{DBAdapter.KEY_AGENCYNAME};
@@ -95,6 +96,7 @@ public class AgencyList extends ListActivity {
     	SimpleCursorAdapter agencies = new SimpleCursorAdapter(this, R.layout.agency_list_item, agencyCursor, from, to);
     	setListAdapter(agencies);
     	db.close();
+    	
     }
     
     @Override
@@ -237,7 +239,7 @@ public class AgencyList extends ListActivity {
     	i.putExtra(DBAdapter.KEY_SAGENCYID, id);
 
     	// Need to display Agency Name on the title of stop list.
-    	String agency_name = DBAdapter.KEY_AGENCYNAME;
+    	String agency_name = c.getString(c.getColumnIndex("agency_name"));
     	i.putExtra(DBAdapter.KEY_AGENCYNAME, agency_name);
         startActivity(i);
     }

@@ -27,7 +27,8 @@ import afzal.gtfsReader.DBAdapter.DBHelper;
 import android.app.ListActivity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.widget.ListView;
+// For search
+import android.widget.ListView; 
 import android.widget.SimpleCursorAdapter;
 
 public class StopList extends ListActivity {

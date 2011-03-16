@@ -77,28 +77,18 @@ public class AgencyEdit extends Activity {
 			String ph = agencyCursor.getString(agencyCursor.getColumnIndex("agency_phone"));
 			String id = agencyCursor.getString(agencyCursor.getColumnIndex("agency_id"));
 			String lang = agencyCursor.getString(agencyCursor.getColumnIndex("agency_lang"));
+    	    stopManagingCursor(agencyCursor);
+    	    agencyCursor.close();
 			AgencyName.setText(name);
 			AgencyURL.setText(url);
 			AgencyTimezone.setText(tz);
 			AgencyPhone.setText(ph);
 			AgencyId.setText(id);
 			AgencyLang.setText(lang);
+		} else {
+			AgencyName.setHint("Agency Name");
 		}
 	}
-	
-    @Override
-    protected void onStop() {
-        stopManagingCursor(agencyCursor);
-        agencyCursor.close();
-        super.onStop();
-    }
-    
-    @Override
-    protected void onDestroy () {
-	    stopManagingCursor(agencyCursor);
-	    agencyCursor.close();
-	    super.onDestroy();
-    }
     
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
