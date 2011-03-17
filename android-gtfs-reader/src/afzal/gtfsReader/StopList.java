@@ -100,10 +100,10 @@ public class StopList extends ListActivity {
     	startManagingCursor(stopCursor);
 
     	// array to specify the fields to display in the list
-    	String[] from = new String[]{DBAdapter.KEY_STOPNAME};
+    	String[] from = new String[]{DBAdapter.KEY_STOPNAME, DBAdapter.KEY_STOPID};
     	
     	// array of fields to bind those fields to
-    	int[] to = new int[]{R.id.stop_name};
+    	int[] to = new int[]{R.id.stop_name, R.id.stop_id};
     	
     	// Simple cursor adapter; set to display
     	SimpleCursorAdapter stops = new SimpleCursorAdapter(this, R.layout.stop_list_item, stopCursor, from, to);
