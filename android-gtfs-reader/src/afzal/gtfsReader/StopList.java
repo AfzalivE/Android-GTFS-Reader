@@ -28,10 +28,16 @@ import android.app.ListActivity;
 import android.database.Cursor;
 import android.os.Bundle;
 // For search
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+// For filtering the list
+import android.widget.FilterQueryProvider;
 import android.widget.ListView; 
 import android.widget.SimpleCursorAdapter;
 
 public class StopList extends ListActivity {
+	private ListView lv;
 	private DBHelper db = new DBHelper();
 	private Long rowId;
 	private String agency_name;
@@ -40,11 +46,29 @@ public class StopList extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.stop_list);
         
+        lv = getListView();
+        lv.setTextFilterEnabled(true);
+        
+        EditText etext = (EditText)findViewById(R.id.search_box);
+        etext.addTextChangedListener(new TextWatcher() {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void afterTextChanged(Editable s) {
+                ListView lv = getListView();
+                SimpleCursorAdapter filterAdapter = (SimpleCursorAdapter) lv.getAdapter();
+                filterAdapter.getFilter().filter(s.toString());
+            }
+        });
+
         Bundle extras = getIntent().getExtras();
         rowId = extras.getLong(DBAdapter.KEY_SAGENCYID);
-        /* Need to import agency_name to StopList intent somehow ... thru agencyCursor maybe? */
+        /* Get agency_name to show in the title */
         agency_name = extras.getString(DBAdapter.KEY_AGENCYNAME);
         
         DisplayStops(rowId);
@@ -76,18 +100,14 @@ public class StopList extends ListActivity {
     	startManagingCursor(stopCursor);
 
     	// array to specify the fields to display in the list
-    	String[] from = new String[]{DBAdapter.KEY_STOPNAME, DBAdapter.KEY_STOPID};
+    	String[] from = new String[]{DBAdapter.KEY_STOPNAME};
     	
     	// array of fields to bind those fields to
-    	int[] to = new int[]{R.id.stop_name, R.id.stop_id};
+    	int[] to = new int[]{R.id.stop_name};
     	
     	// Simple cursor adapter; set to display
     	SimpleCursorAdapter stops = new SimpleCursorAdapter(this, R.layout.stop_list_item, stopCursor, from, to);
-    	setListAdapter(stops);
-    	
-    	// Have to implement filtering using this
-/*    	ListView lv = getListView();
-    	lv.setTextFilterEnabled(true); */
+    	lv.setAdapter(stops);
     	
     	// close db
     	db.close();
