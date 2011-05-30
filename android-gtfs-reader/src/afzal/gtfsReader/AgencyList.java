@@ -39,7 +39,7 @@ import android.widget.SimpleCursorAdapter;
 
 public class AgencyList extends ListActivity {     
     private static final int ACTIVITY_CREATE =0;
-    private static final int ACTIVITY_EDIT =1;
+    private static final int ACTIVITY_EDIT = 1;
     
     private static final int EDIT_ID = Menu.FIRST;
     private static final int DELETE_ID = Menu.FIRST + 1;
@@ -61,13 +61,13 @@ public class AgencyList extends ListActivity {
     }
     
     @Override
-    protected void onPause() {
+    protected void onStop() {
         stopManagingCursor(agencyCursor);
         
         // This is to avoid "Invalid statement in FillWindow()" Error
         // Find out how to copy the contents of SimpleCursorAdapter
         // to a temporary variable which doesn't need to close
-//      agencyCursor.close();
+        agencyCursor.close();
         super.onPause();
     }
  
@@ -95,6 +95,8 @@ public class AgencyList extends ListActivity {
     	// Simple cursor adapter; set to display
     	SimpleCursorAdapter agencies = new SimpleCursorAdapter(this, R.layout.agency_list_item, agencyCursor, from, to);
     	setListAdapter(agencies);
+		 ListView lv = getListView();
+		 lv.setTextFilterEnabled(true);
     	db.close();
     	
     }

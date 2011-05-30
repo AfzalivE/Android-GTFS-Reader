@@ -98,7 +98,7 @@ public class AgencyDetails extends ListActivity {
 		
 			case AgencyAction.ACTION_CALL:
 				Uri callUri = Uri.parse("tel:" + action.getData());
-				i = new Intent(Intent.ACTION_CALL, callUri);
+				i = new Intent(Intent.ACTION_DIAL, callUri);
 				startActivity(i);
 				break;
 				
